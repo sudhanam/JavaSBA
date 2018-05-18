@@ -85,7 +85,12 @@ public class Main {
                                         //fill the code
 
                                         InvoiceDAO invoiceDAO = new InvoiceDAO();
-                                        invoiceList = invoiceDAO.getAllInvoiceList();
+                                        List<Invoice> invoiceListInital = invoiceDAO.getAllInvoiceList();
+                                        invoiceList.clear();
+                                        for(Invoice inv : invoiceListInital) {
+                                            if(!inv.getStatus().equalsIgnoreCase("Paid"))
+                                                invoiceList.add(inv);
+                                        }
 
                                         if (user.getRole().equalsIgnoreCase("Auditor")) {
 
@@ -98,14 +103,14 @@ public class Main {
                                                 //fill the code here
 
                                                 for (Invoice inv : invoiceList) {
-                                                    if (!inv.getStatus().equalsIgnoreCase("Paid")) {
+//                                                    if (!inv.getStatus().equalsIgnoreCase("Paid")) {
                                                         System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", inv.getId(),
                                                                 inv.getInvoiceNumber(),
                                                                 inv.getAmount(),
                                                                 inv.getStatus(),
                                                                 inv.getCreatedBy().getUserName(),
                                                                 inv.getCreatedDate());
-                                                    }
+//                                                    }
                                                 }
 
                                                 System.out.println("Enter the id to update the status:");
@@ -189,67 +194,70 @@ public class Main {
                                     try {
                                         // fill the code here
                                         InvoiceDAO invoiceDAO = new InvoiceDAO();
-                                        invoiceList = invoiceDAO.getAllInvoiceList();
-
-//                                        for(Invoice invoice1 : invoiceListInitial) {
-//                                            if(invoice1.getStatus().equalsIgnoreCase("Approved")) {
-//                                                invoiceList.add(invoice1);
-//                                            }
-//                                        }
-
-                                        if (!invoiceList.isEmpty()) {
-                                            System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", "Id",
-                                                    "Invoice number", "Amount",
-                                                    "Status", "Created by",
-                                                    "Created on");
-                                            //fill the code here
-
-                                            for (Invoice inv : invoiceList) {
-                                                if (user.getRole().equalsIgnoreCase("Payment Releaser") && inv.getStatus().equalsIgnoreCase("Approved")) {
-                                                    System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", inv.getId(),
-                                                            inv.getInvoiceNumber(),
-                                                            inv.getAmount(),
-                                                            inv.getStatus(),
-                                                            inv.getCreatedBy().getUserName(),
-                                                            inv.getCreatedDate());
-                                                }
-                                                if (user.getRole().equalsIgnoreCase("Auditor") && !inv.getStatus().equalsIgnoreCase("Paid")) {
-                                                    System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", inv.getId(),
-                                                            inv.getInvoiceNumber(),
-                                                            inv.getAmount(),
-                                                            inv.getStatus(),
-                                                            inv.getCreatedBy().getUserName(),
-                                                            inv.getCreatedDate());
-                                                }
-                                            }
-
-                                            System.out.println("Enter the id to Pay::");
-                                            invoiceId = new Integer(br.readLine());
-
-                                            Invoice payment = null;
-                                            boolean matched = false;
-                                            for (Invoice inv : invoiceList) {
-                                                if (invoiceId.equals(inv.getId())) {
-                                                    matched = true;
-                                                    payment = inv;
-                                                }
-                                            }
-                                            if (matched) {
-                                                // fill teh code here
-                                                if (user.getRole().equalsIgnoreCase("Payment Releaser")) {
-
-                                                    invoiceDAO.invoicePayment(payment);
-                                                    System.out.println("Invoice paid successfully");
-
-                                                } else {
-                                                    throw new InsufficientPrivilegeException("Permission Denied");
-                                                }
-
-                                            } else {
-                                                System.out.println("Invoice Id is invalid");
-                                            }
+                                        List<Invoice> invoiceListInital = invoiceDAO.getAllInvoiceList();
+                                        invoiceList.clear();
+                                        for(Invoice inv : invoiceListInital) {
+                                            if(!inv.getStatus().equalsIgnoreCase("Paid"))
+                                                invoiceList.add(inv);
                                         }
 
+                                       if (user.getRole().equalsIgnoreCase("Clerk")) {
+                                            throw new InsufficientPrivilegeException("Permission Denied");
+                                       } else {
+
+                                           if (!invoiceList.isEmpty()) {
+                                               System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", "Id",
+                                                       "Invoice number", "Amount",
+                                                       "Status", "Created by",
+                                                       "Created on");
+                                               //fill the code here
+
+                                               for (Invoice inv : invoiceList) {
+                                                   if (user.getRole().equalsIgnoreCase("Payment Releaser") && inv.getStatus().equalsIgnoreCase("Approved")) {
+                                                       System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", inv.getId(),
+                                                               inv.getInvoiceNumber(),
+                                                               inv.getAmount(),
+                                                               inv.getStatus(),
+                                                               inv.getCreatedBy().getUserName(),
+                                                               inv.getCreatedDate());
+                                                   }
+                                                   if (user.getRole().equalsIgnoreCase("Auditor") && !inv.getStatus().equalsIgnoreCase("Paid")) {
+                                                       System.out.format("%-5s %-15s %-10s %-15s %-15s %s\n", inv.getId(),
+                                                               inv.getInvoiceNumber(),
+                                                               inv.getAmount(),
+                                                               inv.getStatus(),
+                                                               inv.getCreatedBy().getUserName(),
+                                                               inv.getCreatedDate());
+                                                   }
+                                               }
+
+                                               System.out.println("Enter the id to Pay::");
+                                               invoiceId = new Integer(br.readLine());
+
+                                               Invoice payment = null;
+                                               boolean matched = false;
+                                               for (Invoice inv : invoiceList) {
+                                                   if (invoiceId.equals(inv.getId())) {
+                                                       matched = true;
+                                                       payment = inv;
+                                                   }
+                                               }
+                                               if (matched) {
+                                                   // fill teh code here
+                                                   if (user.getRole().equalsIgnoreCase("Payment Releaser")) {
+
+                                                       invoiceDAO.invoicePayment(payment);
+                                                       System.out.println("Invoice paid successfully");
+
+                                                   } else {
+                                                       throw new InsufficientPrivilegeException("Permission Denied");
+                                                   }
+
+                                               } else {
+                                                   System.out.println("Invoice Id is invalid");
+                                               }
+                                           }
+                                       }
                                     } catch (Exception e) {
 //                                        System.out.println(e.toString());
                                     }
